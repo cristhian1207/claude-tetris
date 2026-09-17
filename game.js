@@ -39,8 +39,38 @@ const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
+const themeToggle = document.getElementById('theme-toggle');
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
+let gridColor, blockHighlight;
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  themeToggle.checked = theme === 'light';
+  try {
+    localStorage.setItem('theme', theme);
+  } catch (e) {
+    // localStorage no disponible (p. ej. modo incógnito); ignorar persistencia
+  }
+  const styles = getComputedStyle(document.documentElement);
+  gridColor = styles.getPropertyValue('--grid-line').trim();
+  blockHighlight = styles.getPropertyValue('--block-highlight').trim();
+  if (board) draw();
+}
+
+function initTheme() {
+  let saved = null;
+  try {
+    saved = localStorage.getItem('theme');
+  } catch (e) {
+    // localStorage no disponible (p. ej. modo incógnito); usar default
+  }
+  applyTheme(saved === 'light' ? 'light' : 'dark');
+}
+
+themeToggle.addEventListener('change', () => {
+  applyTheme(themeToggle.checked ? 'light' : 'dark');
+});
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
@@ -163,13 +193,13 @@ function drawBlock(context, x, y, colorIndex, size, alpha) {
   context.fillStyle = color;
   context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
   // highlight
-  context.fillStyle = 'rgba(255,255,255,0.12)';
+  context.fillStyle = blockHighlight;
   context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
   context.globalAlpha = 1;
 }
 
 function drawGrid() {
-  ctx.strokeStyle = '#22222e';
+  ctx.strokeStyle = gridColor;
   ctx.lineWidth = 0.5;
   for (let c = 1; c < COLS; c++) {
     ctx.beginPath();
@@ -257,6 +287,7 @@ function loop(ts) {
 }
 
 function init() {
+  initTheme();
   board = createBoard();
   score = 0;
   lines = 0;
