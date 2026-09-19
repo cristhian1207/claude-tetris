@@ -32,8 +32,8 @@ keydown handler → move / tryRotate() / softDrop() / hardDrop() / togglePause()
 
 Key mechanics and where they live (all in `game.js`):
 
-- **Board model**: `board` is a `ROWS × COLS` matrix; each cell is `0` (empty) or a piece color index (1–7).
-- **Pieces**: `PIECES` are square matrices; `randomPiece()` picks one of the 7 standard tetrominoes. Rotation (`rotateCW`) transposes + reverses rows; `tryRotate()` applies basic wall-kick offsets (`[0, -1, 1, -2, 2]`) before giving up on a rotation.
+- **Board model**: `board` is a `ROWS × COLS` matrix; each cell is `0` (empty) or a piece color index (1–8).
+- **Pieces**: `PIECES` are square matrices; `randomPiece()` picks one of the 8 pieces (the 7 standard tetrominoes plus a 3x3 nut: a filled ring with a hollow centre). Rotation (`rotateCW`) transposes + reverses rows; `tryRotate()` applies basic wall-kick offsets (`[0, -1, 1, -2, 2]`) before giving up on a rotation.
 - **Collision**: `collide(shape, ox, oy)` checks board bounds and existing filled cells.
 - **Locking/scoring**: `lockPiece()` → `merge()` writes the piece into `board`, then `clearLines()` removes full rows (scanning bottom-up) and awards points via `LINE_SCORES = [0, 100, 300, 500, 800]` multiplied by `level`. Level increases every 10 lines cleared, and `dropInterval` speeds up accordingly (`max(100, 1000 - (level-1)*90)` ms).
 - **Ghost piece**: `ghostY()` projects the current piece straight down; drawn via `draw()` with reduced alpha.
